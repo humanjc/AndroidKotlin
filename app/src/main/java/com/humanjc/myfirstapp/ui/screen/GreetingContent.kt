@@ -23,6 +23,7 @@ import com.humanjc.myfirstapp.ui.component.PressableButton
 fun GreetingContent(
     uiState: ButtonUiState,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     onPressChanged: (Boolean) -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier
@@ -57,6 +58,7 @@ fun GreetingContent(
                 scale = scale,
                 color = buttonColor,
                 onClick = onClick,
+                onLongClick = onLongClick,
                 onPressChanged = onPressChanged
             )
 

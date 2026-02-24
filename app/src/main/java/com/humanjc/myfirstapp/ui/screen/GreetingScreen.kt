@@ -15,6 +15,7 @@ fun GreetingScreen(
     GreetingContent(
         uiState = uiState,
         onClick = viewModel::onClick,
+        onLongClick = viewModel::onLongClick,
         onPressChanged = viewModel::onButtonPress,
         onReset = viewModel::reset,
         modifier = modifier

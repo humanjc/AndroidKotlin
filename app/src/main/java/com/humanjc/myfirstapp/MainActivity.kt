@@ -36,6 +36,7 @@ fun GreetingContentPreviewWithHistory() {
             )
         ),
         onClick = {},
+        onLongClick = {},
         onPressChanged = {},
         onReset = {}
     )
@@ -51,6 +52,7 @@ fun PreviewInitial() {
     GreetingContent(
         uiState = ButtonUiState(),
         onClick = {},
+        onLongClick = {},
         onPressChanged = {},
         onReset = {}
     )
@@ -66,6 +68,7 @@ fun PreviewDisabled() {
     GreetingContent(
         uiState = ButtonUiState(count = 10),
         onClick = {},
+        onLongClick = {},
         onPressChanged = {},
         onReset = {}
     )

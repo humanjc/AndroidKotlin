@@ -13,10 +13,18 @@ class GreetingViewModel : ViewModel() {
     }
 
     fun onClick() {
+        incrementCount(1, "버튼 클릭")
+    }
+
+    fun onLongClick() {
+        incrementCount(5, "버튼 길게 클릭")
+    }
+
+    private fun incrementCount(amount: Int, actionName: String) {
         val state = _uiState.value
         if (state.isEnabled) {
-            val newCount = state.count + 1
-            val newHistory = listOf("버튼 ${newCount}회 클릭") + state.history
+            val newCount = state.count + amount
+            val newHistory = listOf("$actionName: ${newCount}회 (${if (amount > 1) "+$amount" else "+1"})") + state.history
 
             _uiState.value = state.copy(
                 count = newCount,
