@@ -17,6 +17,8 @@ import androidx.navigation.compose.rememberNavController
 import com.humanjc.myfirstapp.ui.event.UiEvent
 import com.humanjc.myfirstapp.ui.home.HomeContent
 import com.humanjc.myfirstapp.ui.home.HomeViewModel
+import com.humanjc.myfirstapp.ui.quote.QuoteContent
+import com.humanjc.myfirstapp.ui.quote.QuoteViewModel
 import com.humanjc.myfirstapp.ui.settings.SettingsContent
 import com.humanjc.myfirstapp.ui.theme.MyFirstAppTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -55,7 +57,8 @@ fun AppNavigation(viewModel: HomeViewModel = hiltViewModel()) {
                     onLongClick = viewModel::onLongClick,
                     onPressChanged = viewModel::onButtonPress,
                     onReset = viewModel::reset,
-                    onSettingsClick = { navController.navigate("settings") }
+                    onSettingsClick = { navController.navigate("settings") },
+                    onQuoteClick = { navController.navigate("quote") }
                 )
             }
             composable("settings") {
@@ -65,6 +68,15 @@ fun AppNavigation(viewModel: HomeViewModel = hiltViewModel()) {
                     onThemeChange = viewModel::onThemeChange,
                     onResetSettings = viewModel::resetSettings,
                     onBackClick = { navController.popBackStack() }
+                )
+            }
+            composable("quote") {
+                val quoteViewModel: QuoteViewModel = hiltViewModel()
+                val quoteUiState by quoteViewModel.uiState.collectAsStateWithLifecycle()
+                QuoteContent(
+                    uiState = quoteUiState,
+                    onBackClick = { navController.popBackStack() },
+                    onRefreshClick = quoteViewModel::loadQuote
                 )
             }
         }

@@ -3,7 +3,6 @@ package com.humanjc.myfirstapp.ui.home
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -45,6 +45,7 @@ fun HomeContent(
     onPressChanged: (Boolean) -> Unit,
     onReset: () -> Unit,
     onSettingsClick: () -> Unit,
+    onQuoteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scale by animateFloatAsState(
@@ -68,6 +69,9 @@ fun HomeContent(
             TopAppBar(
                 title = { Text("카운터 앱", fontWeight = FontWeight.Bold) },
                 actions = {
+                    IconButton(onClick = onQuoteClick) {
+                        Icon(Icons.Default.Info, contentDescription = "명언")
+                    }
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Default.Settings, contentDescription = "설정")
                     }

@@ -44,7 +44,8 @@ fun GreetingContentPreviewWithHistory() {
             onLongClick = {},
             onPressChanged = {},
             onReset = {},
-            onSettingsClick = {}
+            onSettingsClick = {},
+            onQuoteClick = {}
         )
     }
 }

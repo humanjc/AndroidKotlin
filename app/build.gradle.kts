@@ -60,6 +60,8 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
     kapt(libs.androidx.room.compiler)
     kapt(libs.dagger.hilt.compiler)
     testImplementation(libs.junit)
