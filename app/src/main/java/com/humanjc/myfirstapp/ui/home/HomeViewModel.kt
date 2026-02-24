@@ -2,7 +2,7 @@ package com.humanjc.myfirstapp.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.humanjc.myfirstapp.data.CounterDataStore
+import com.humanjc.myfirstapp.data.repository.CounterRepository
 import com.humanjc.myfirstapp.ui.event.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val dataStore: CounterDataStore
+    private val repository: CounterRepository
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -27,20 +27,27 @@ class HomeViewModel @Inject constructor(
     val uiEvent = _uiEvent.asSharedFlow()
 
     init {
-        // 앱 시작 시 저장된 데이터 불러오기
+        // 설정 데이터 불러오기
         viewModelScope.launch {
-            val count = dataStore.countFlow.first()
-            val maxCount = dataStore.maxCountFlow.first()
-            val history = dataStore.historyFlow.first()
-            val isDarkMode = dataStore.isDarkModeFlow.first() ?: false
+            val count = repository.countFlow.first()
+            val maxCount = repository.maxCountFlow.first()
+            val isDarkMode = repository.isDarkModeFlow.first() ?: false
             
             _uiState.update { 
                 it.copy(
                     count = count,
                     maxCount = maxCount,
-                    history = history,
                     isDarkMode = isDarkMode
                 )
+            }
+        }
+
+        // 히스토리 실시간 구독 (Room Flow)
+        viewModelScope.launch {
+            repository.historyFlow.collect { records ->
+                _uiState.update { state ->
+                    state.copy(history = records.map { it.toDisplayString() })
+                }
             }
         }
     }
@@ -71,7 +78,6 @@ class HomeViewModel @Inject constructor(
         _uiState.update { state ->
             if (state.isEnabled) {
                 val newCount = (state.count + amount).coerceAtMost(state.maxCount)
-                val newHistory = listOf("$actionName: ${newCount}회 (${if (amount > 1) "+$amount" else "+1"})") + state.history
 
                 if (amount > 1) {
                     emitEvent(UiEvent.Vibrate)
@@ -81,10 +87,12 @@ class HomeViewModel @Inject constructor(
                     emitEvent(UiEvent.ShowToast("최대 횟수에 도달했습니다!"))
                 }
                 
-                val newState = state.copy(
-                    count = newCount,
-                    history = newHistory
-                )
+                val newState = state.copy(count = newCount)
+                
+                // Room에 기록 저장
+                viewModelScope.launch {
+                    repository.addClickRecord(newCount, actionName)
+                }
                 
                 saveToDataStore(newState)
                 newState
@@ -95,9 +103,12 @@ class HomeViewModel @Inject constructor(
     }
 
     fun reset() {
-        _uiState.update { it.copy(count = 0, history = emptyList()) }
+        _uiState.update { it.copy(count = 0) }
         emitEvent(UiEvent.ShowSnackbar("활동 기록이 초기화되었습니다."))
-        saveToDataStore()
+        viewModelScope.launch {
+            repository.clearHistory()
+            saveToDataStore()
+        }
     }
 
     fun resetSettings() {
@@ -108,7 +119,7 @@ class HomeViewModel @Inject constructor(
 
     private fun saveToDataStore(state: HomeUiState = _uiState.value) {
         viewModelScope.launch {
-            dataStore.saveCounterData(state.count, state.maxCount, state.history, state.isDarkMode)
+            repository.saveSettings(state.count, state.maxCount, state.isDarkMode)
         }
     }
 
