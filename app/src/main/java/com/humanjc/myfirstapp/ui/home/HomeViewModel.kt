@@ -1,10 +1,10 @@
 package com.humanjc.myfirstapp.ui.home
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.humanjc.myfirstapp.data.CounterDataStore
 import com.humanjc.myfirstapp.ui.event.UiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,9 +13,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
-    private val dataStore = CounterDataStore(application)
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val dataStore: CounterDataStore
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -24,6 +27,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val uiEvent = _uiEvent.asSharedFlow()
 
     init {
+        // 앱 시작 시 저장된 데이터 불러오기
         viewModelScope.launch {
             val count = dataStore.countFlow.first()
             val maxCount = dataStore.maxCountFlow.first()

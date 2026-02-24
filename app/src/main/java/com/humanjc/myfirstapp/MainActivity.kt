@@ -6,28 +6,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.humanjc.myfirstapp.ui.home.HomeContent
 import com.humanjc.myfirstapp.ui.home.HomeUiState
-import com.humanjc.myfirstapp.ui.home.HomeViewModel
 import com.humanjc.myfirstapp.ui.navigation.AppNavigation
 import com.humanjc.myfirstapp.ui.theme.MyFirstAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val viewModel: HomeViewModel = viewModel()
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            
-            MyFirstAppTheme(darkTheme = uiState.isDarkMode) {
-                AppNavigation(viewModel = viewModel)
-            }
+            AppNavigation()
         }
     }
 }
