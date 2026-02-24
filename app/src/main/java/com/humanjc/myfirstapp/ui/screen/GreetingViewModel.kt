@@ -1,14 +1,16 @@
 package com.humanjc.myfirstapp.ui.screen
 
 import android.app.Application
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.humanjc.myfirstapp.data.CounterDataStore
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed class UiEvent {
@@ -20,8 +22,8 @@ sealed class UiEvent {
 class GreetingViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = CounterDataStore(application)
     
-    private val _uiState = mutableStateOf(ButtonUiState())
-    val uiState: State<ButtonUiState> = _uiState
+    private val _uiState = MutableStateFlow(ButtonUiState())
+    val uiState: StateFlow<ButtonUiState> = _uiState.asStateFlow()
 
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -34,26 +36,28 @@ class GreetingViewModel(application: Application) : AndroidViewModel(application
             val history = dataStore.historyFlow.first()
             val isDarkMode = dataStore.isDarkModeFlow.first() ?: false
             
-            _uiState.value = _uiState.value.copy(
-                count = count,
-                maxCount = maxCount,
-                history = history,
-                isDarkMode = isDarkMode
-            )
+            _uiState.update { 
+                it.copy(
+                    count = count,
+                    maxCount = maxCount,
+                    history = history,
+                    isDarkMode = isDarkMode
+                )
+            }
         }
     }
 
     fun onThemeChange(isDark: Boolean) {
-        _uiState.value = _uiState.value.copy(isDarkMode = isDark)
+        _uiState.update { it.copy(isDarkMode = isDark) }
         saveToDataStore()
     }
 
     fun onButtonPress(pressed: Boolean) {
-        _uiState.value = _uiState.value.copy(isPressed = pressed)
+        _uiState.update { it.copy(isPressed = pressed) }
     }
 
     fun onMaxCountChange(newMax: Int) {
-        _uiState.value = _uiState.value.copy(maxCount = newMax)
+        _uiState.update { it.copy(maxCount = newMax) }
         saveToDataStore()
     }
 
@@ -66,38 +70,41 @@ class GreetingViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun incrementCount(amount: Int, actionName: String) {
-        val state = _uiState.value
-        if (state.isEnabled) {
-            val newCount = (state.count + amount).coerceAtMost(state.maxCount)
-            val newHistory = listOf("$actionName: ${newCount}회 (${if (amount > 1) "+$amount" else "+1"})") + state.history
+        _uiState.update { state ->
+            if (state.isEnabled) {
+                val newCount = (state.count + amount).coerceAtMost(state.maxCount)
+                val newHistory = listOf("$actionName: ${newCount}회 (${if (amount > 1) "+$amount" else "+1"})") + state.history
 
-            _uiState.value = state.copy(
-                count = newCount,
-                history = newHistory
-            )
+                if (amount > 1) {
+                    emitEvent(UiEvent.Vibrate)
+                }
 
-            if (amount > 1) {
-                emitEvent(UiEvent.Vibrate)
+                if (newCount >= state.maxCount) {
+                    emitEvent(UiEvent.ShowToast("최대 횟수에 도달했습니다!"))
+                }
+                
+                val newState = state.copy(
+                    count = newCount,
+                    history = newHistory
+                )
+                
+                saveToDataStore(newState)
+                newState
+            } else {
+                state
             }
-
-            if (newCount >= state.maxCount) {
-                emitEvent(UiEvent.ShowToast("최대 횟수에 도달했습니다!"))
-            }
-            
-            saveToDataStore()
         }
     }
 
     fun reset() {
-        _uiState.value = ButtonUiState()
+        _uiState.update { ButtonUiState() }
         emitEvent(UiEvent.ShowSnackbar("모든 기록이 초기화되었습니다."))
         viewModelScope.launch {
             dataStore.clearData()
         }
     }
 
-    private fun saveToDataStore() {
-        val state = _uiState.value
+    private fun saveToDataStore(state: ButtonUiState = _uiState.value) {
         viewModelScope.launch {
             dataStore.saveCounterData(state.count, state.maxCount, state.history, state.isDarkMode)
         }
