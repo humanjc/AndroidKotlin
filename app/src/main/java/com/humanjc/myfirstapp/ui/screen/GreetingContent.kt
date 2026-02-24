@@ -5,16 +5,20 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +37,7 @@ fun GreetingContent(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onMaxCountChange: (Int) -> Unit,
+    onThemeChange: (Boolean) -> Unit,
     onPressChanged: (Boolean) -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier
@@ -66,10 +71,22 @@ fun GreetingContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(24.dp)
             ) {
+                // 테마 토글 추가
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    Text(if (uiState.isDarkMode) "다크 모드" else "라이트 모드")
+                    Spacer(Modifier.width(8.dp))
+                    Switch(
+                        checked = uiState.isDarkMode,
+                        onCheckedChange = onThemeChange
+                    )
+                }
 
                 Text(
                     text = "현재 ${uiState.count} / ${uiState.maxCount} 번 눌렀어요",
-                    color = if (uiState.isEnabled) Color.Black else Color.Red
+                    color = if (uiState.isEnabled) MaterialTheme.colorScheme.onBackground else Color.Red
                 )
 
                 Spacer(Modifier.height(16.dp))

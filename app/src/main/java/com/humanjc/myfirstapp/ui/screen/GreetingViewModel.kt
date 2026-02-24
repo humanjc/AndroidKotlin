@@ -32,13 +32,20 @@ class GreetingViewModel(application: Application) : AndroidViewModel(application
             val count = dataStore.countFlow.first()
             val maxCount = dataStore.maxCountFlow.first()
             val history = dataStore.historyFlow.first()
+            val isDarkMode = dataStore.isDarkModeFlow.first() ?: false
             
             _uiState.value = _uiState.value.copy(
                 count = count,
                 maxCount = maxCount,
-                history = history
+                history = history,
+                isDarkMode = isDarkMode
             )
         }
+    }
+
+    fun onThemeChange(isDark: Boolean) {
+        _uiState.value = _uiState.value.copy(isDarkMode = isDark)
+        saveToDataStore()
     }
 
     fun onButtonPress(pressed: Boolean) {
@@ -92,7 +99,7 @@ class GreetingViewModel(application: Application) : AndroidViewModel(application
     private fun saveToDataStore() {
         val state = _uiState.value
         viewModelScope.launch {
-            dataStore.saveCounterData(state.count, state.maxCount, state.history)
+            dataStore.saveCounterData(state.count, state.maxCount, state.history, state.isDarkMode)
         }
     }
 

@@ -3,6 +3,7 @@ package com.humanjc.myfirstapp.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -18,6 +19,7 @@ class CounterDataStore(private val context: Context) {
         private val COUNT_KEY = intPreferencesKey("count")
         private val MAX_COUNT_KEY = intPreferencesKey("max_count")
         private val HISTORY_KEY = stringPreferencesKey("history")
+        private val IS_DARK_MODE_KEY = booleanPreferencesKey("is_dark_mode")
     }
 
     val countFlow: Flow<Int> = context.dataStore.data.map { preferences ->
@@ -33,11 +35,16 @@ class CounterDataStore(private val context: Context) {
         if (historyString.isEmpty()) emptyList() else historyString.split("|")
     }
 
-    suspend fun saveCounterData(count: Int, maxCount: Int, history: List<String>) {
+    val isDarkModeFlow: Flow<Boolean?> = context.dataStore.data.map { preferences ->
+        preferences[IS_DARK_MODE_KEY]
+    }
+
+    suspend fun saveCounterData(count: Int, maxCount: Int, history: List<String>, isDarkMode: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[COUNT_KEY] = count
             preferences[MAX_COUNT_KEY] = maxCount
             preferences[HISTORY_KEY] = history.joinToString("|")
+            preferences[IS_DARK_MODE_KEY] = isDarkMode
         }
     }
 

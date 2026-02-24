@@ -42,6 +42,7 @@ fun GreetingContentPreviewWithHistory() {
         onClick = {},
         onLongClick = {},
         onMaxCountChange = {},
+        onThemeChange = {},
         onPressChanged = {},
         onReset = {}
     )
@@ -61,6 +62,7 @@ fun PreviewInitial() {
         onClick = {},
         onLongClick = {},
         onMaxCountChange = {},
+        onThemeChange = {},
         onPressChanged = {},
         onReset = {}
     )
@@ -80,6 +82,7 @@ fun PreviewDisabled() {
         onClick = {},
         onLongClick = {},
         onMaxCountChange = {},
+        onThemeChange = {},
         onPressChanged = {},
         onReset = {}
     )
