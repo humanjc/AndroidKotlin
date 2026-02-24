@@ -12,6 +12,10 @@ class GreetingViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(isPressed = pressed)
     }
 
+    fun onMaxCountChange(newMax: Int) {
+        _uiState.value = _uiState.value.copy(maxCount = newMax)
+    }
+
     fun onClick() {
         incrementCount(1, "버튼 클릭")
     }

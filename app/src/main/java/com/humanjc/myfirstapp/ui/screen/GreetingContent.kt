@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,12 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.humanjc.myfirstapp.ui.component.HistoryList
 import com.humanjc.myfirstapp.ui.component.PressableButton
+import kotlin.math.roundToInt
 
 @Composable
 fun GreetingContent(
     uiState: ButtonUiState,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    onMaxCountChange: (Int) -> Unit,
     onPressChanged: (Boolean) -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier
@@ -47,9 +52,30 @@ fun GreetingContent(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(24.dp)
+        ) {
 
-            Text("현재 ${uiState.count} 번 눌렀어요")
+            Text(
+                text = "현재 ${uiState.count} / ${uiState.maxCount} 번 눌렀어요",
+                color = if (uiState.isEnabled) Color.Black else Color.Red
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            Text("최대 횟수 설정: ${uiState.maxCount}")
+            Slider(
+                value = uiState.maxCount.toFloat(),
+                onValueChange = { onMaxCountChange(it.roundToInt()) },
+                valueRange = 5f..20f,
+                steps = 2, // 5, 10, 15, 20 중 선택 (또는 직접 값 조정)
+                modifier = Modifier.padding(horizontal = 32.dp),
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF4CAF50),
+                    activeTrackColor = Color(0xFF4CAF50)
+                )
+            )
 
             Spacer(Modifier.height(16.dp))
 
