@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +29,7 @@ import kotlin.math.roundToInt
 @Composable
 fun GreetingContent(
     uiState: ButtonUiState,
+    snackbarHostState: SnackbarHostState,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onMaxCountChange: (Int) -> Unit,
@@ -48,55 +52,62 @@ fun GreetingContent(
         label = "color"
     )
 
-    Box(
+    Scaffold(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(24.dp)
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentAlignment = Alignment.Center
         ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(24.dp)
+            ) {
 
-            Text(
-                text = "현재 ${uiState.count} / ${uiState.maxCount} 번 눌렀어요",
-                color = if (uiState.isEnabled) Color.Black else Color.Red
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            Text("최대 횟수 설정: ${uiState.maxCount}")
-            Slider(
-                value = uiState.maxCount.toFloat(),
-                onValueChange = { onMaxCountChange(it.roundToInt()) },
-                valueRange = 5f..20f,
-                steps = 2, // 5, 10, 15, 20 중 선택 (또는 직접 값 조정)
-                modifier = Modifier.padding(horizontal = 32.dp),
-                colors = SliderDefaults.colors(
-                    thumbColor = Color(0xFF4CAF50),
-                    activeTrackColor = Color(0xFF4CAF50)
+                Text(
+                    text = "현재 ${uiState.count} / ${uiState.maxCount} 번 눌렀어요",
+                    color = if (uiState.isEnabled) Color.Black else Color.Red
                 )
-            )
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
 
-            PressableButton(
-                enabled = uiState.isEnabled,
-                scale = scale,
-                color = buttonColor,
-                onClick = onClick,
-                onLongClick = onLongClick,
-                onPressChanged = onPressChanged
-            )
+                Text("최대 횟수 설정: ${uiState.maxCount}")
+                Slider(
+                    value = uiState.maxCount.toFloat(),
+                    onValueChange = { onMaxCountChange(it.roundToInt()) },
+                    valueRange = 5f..20f,
+                    steps = 2,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color(0xFF4CAF50),
+                        activeTrackColor = Color(0xFF4CAF50)
+                    )
+                )
 
-            Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(16.dp))
 
-            HistoryList(
-                history = uiState.history,
-                modifier = Modifier.height(200.dp)
-            )
+                PressableButton(
+                    enabled = uiState.isEnabled,
+                    scale = scale,
+                    color = buttonColor,
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                    onPressChanged = onPressChanged
+                )
 
-            Button(onClick = onReset) {
-                Text("초기화")
+                Spacer(Modifier.height(8.dp))
+
+                HistoryList(
+                    history = uiState.history,
+                    modifier = Modifier.height(200.dp)
+                )
+
+                Button(onClick = onReset) {
+                    Text("초기화")
+                }
             }
         }
     }

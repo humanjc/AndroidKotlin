@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.humanjc.myfirstapp.ui.screen.ButtonUiState
 import com.humanjc.myfirstapp.ui.screen.GreetingContent
@@ -26,6 +28,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun GreetingContentPreviewWithHistory() {
+    val snackbarHostState = remember { SnackbarHostState() }
     GreetingContent(
         uiState = ButtonUiState(
             count = 3,
@@ -35,6 +38,7 @@ fun GreetingContentPreviewWithHistory() {
                 "버튼 3회 클릭"
             )
         ),
+        snackbarHostState = snackbarHostState,
         onClick = {},
         onLongClick = {},
         onMaxCountChange = {},
@@ -50,8 +54,10 @@ fun GreetingContentPreviewWithHistory() {
 )
 @Composable
 fun PreviewInitial() {
+    val snackbarHostState = remember { SnackbarHostState() }
     GreetingContent(
         uiState = ButtonUiState(),
+        snackbarHostState = snackbarHostState,
         onClick = {},
         onLongClick = {},
         onMaxCountChange = {},
@@ -67,8 +73,10 @@ fun PreviewInitial() {
 )
 @Composable
 fun PreviewDisabled() {
+    val snackbarHostState = remember { SnackbarHostState() }
     GreetingContent(
         uiState = ButtonUiState(count = 10),
+        snackbarHostState = snackbarHostState,
         onClick = {},
         onLongClick = {},
         onMaxCountChange = {},
