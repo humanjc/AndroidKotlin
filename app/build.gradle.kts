@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)
+    implementation(libs.lottie.compose)
     kapt(libs.androidx.room.compiler)
     kapt(libs.dagger.hilt.compiler)
     testImplementation(libs.junit)
