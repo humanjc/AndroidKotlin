@@ -1,9 +1,10 @@
-package com.humanjc.myfirstapp.ui.screen
+package com.humanjc.myfirstapp.ui.home
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.humanjc.myfirstapp.data.CounterDataStore
+import com.humanjc.myfirstapp.ui.event.UiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,23 +14,16 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-sealed class UiEvent {
-    data class ShowToast(val message: String) : UiEvent()
-    data class ShowSnackbar(val message: String) : UiEvent()
-    object Vibrate : UiEvent()
-}
-
-class GreetingViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = CounterDataStore(application)
     
-    private val _uiState = MutableStateFlow(ButtonUiState())
-    val uiState: StateFlow<ButtonUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
     init {
-        // 앱 시작 시 저장된 데이터 불러오기
         viewModelScope.launch {
             val count = dataStore.countFlow.first()
             val maxCount = dataStore.maxCountFlow.first()
@@ -97,14 +91,18 @@ class GreetingViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun reset() {
-        _uiState.update { ButtonUiState() }
-        emitEvent(UiEvent.ShowSnackbar("모든 기록이 초기화되었습니다."))
-        viewModelScope.launch {
-            dataStore.clearData()
-        }
+        _uiState.update { it.copy(count = 0, history = emptyList()) }
+        emitEvent(UiEvent.ShowSnackbar("활동 기록이 초기화되었습니다."))
+        saveToDataStore()
     }
 
-    private fun saveToDataStore(state: ButtonUiState = _uiState.value) {
+    fun resetSettings() {
+        _uiState.update { it.copy(maxCount = 10, isDarkMode = false) }
+        emitEvent(UiEvent.ShowSnackbar("설정값이 초기화되었습니다."))
+        saveToDataStore()
+    }
+
+    private fun saveToDataStore(state: HomeUiState = _uiState.value) {
         viewModelScope.launch {
             dataStore.saveCounterData(state.count, state.maxCount, state.history, state.isDarkMode)
         }

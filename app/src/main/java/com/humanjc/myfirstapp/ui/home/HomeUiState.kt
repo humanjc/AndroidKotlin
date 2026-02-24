@@ -1,6 +1,6 @@
-package com.humanjc.myfirstapp.ui.screen
+package com.humanjc.myfirstapp.ui.home
 
-data class ButtonUiState(
+data class HomeUiState(
     val count: Int = 0,
     val maxCount: Int = 10,
     val isPressed: Boolean = false,
