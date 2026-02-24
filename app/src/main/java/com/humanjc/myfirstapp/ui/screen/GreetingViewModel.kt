@@ -15,7 +15,13 @@ class GreetingViewModel : ViewModel() {
     fun onClick() {
         val state = _uiState.value
         if (state.isEnabled) {
-            _uiState.value = state.copy(count = state.count + 1)
+            val newCount = state.count + 1
+            val newHistory = listOf("버튼 ${newCount}회 클릭") + state.history
+
+            _uiState.value = state.copy(
+                count = newCount,
+                history = newHistory
+            )
         }
     }
 

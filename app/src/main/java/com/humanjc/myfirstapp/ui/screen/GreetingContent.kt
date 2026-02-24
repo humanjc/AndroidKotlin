@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +53,17 @@ fun GreetingContent(
             Text("현재 ${uiState.count} 번 눌렀어요")
 
             Spacer(Modifier.height(16.dp))
+
+            LazyColumn(
+                modifier = Modifier.height(200.dp)
+            ) {
+                items(uiState.history) { item ->
+                    Text(
+                        text = item,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+            }
 
             PressableButton(
                 enabled = uiState.isEnabled,

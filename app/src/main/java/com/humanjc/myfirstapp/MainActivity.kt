@@ -23,6 +23,24 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun GreetingContentPreviewWithHistory() {
+    GreetingContent(
+        uiState = ButtonUiState(
+            count = 3,
+            history = listOf(
+                "버튼 1회 클릭",
+                "버튼 2회 클릭",
+                "버튼 3회 클릭"
+            )
+        ),
+        onClick = {},
+        onPressChanged = {},
+        onReset = {}
+    )
+}
+
 @Preview(
     name = "초기 상태",
     showBackground = true,
